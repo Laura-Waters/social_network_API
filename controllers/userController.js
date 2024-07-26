@@ -63,7 +63,6 @@ module.exports = {
       res.status(500).json(err);
     }
   },
-
   // Add a friend to a user's friend list 
   async addFriend(req, res) {
     console.log('You are adding a friend!');
