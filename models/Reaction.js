@@ -1,4 +1,4 @@
-const { Schema } = require('mongoose');
+const { Schema, ObjectId } = require('mongoose');
 
 const reactionSchema = new Schema(
     {
