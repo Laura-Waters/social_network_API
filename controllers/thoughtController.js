@@ -119,7 +119,7 @@ module.exports = {
   // Delete a reaction   
   async deleteReaction(req, res) {
     try {
-      const reaction = await Reaction.findOneAndRemove(
+      const reaction = await Reaction.findOneAndDelete(
         { _id: req.params.reactionId });
 
       if (!reaction) {
