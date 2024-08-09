@@ -1,4 +1,4 @@
-const { Thought, Reaction } = require('../models');
+const { Thought, Reaction, User } = require('../models');
 
 module.exports = {
   // Get all thoughts 
@@ -28,13 +28,15 @@ module.exports = {
   // Create a new thought 
   async createThought(req, res) {
     try {
+      const user = await User.findOne({ username: req.body.username });
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
       const thought = await Thought.create(req.body);
       // update the associated User 
-      await User.findOneAndUpdate(
-        { _id: req.body.userId },
-        { $push: { thoughts: thought._id } },
-        { new: true }
-      );
+      user.thoughts.push(thought._id);
+      await user.save();
 
       res.json(thought);
     } catch (err) {
@@ -63,7 +65,7 @@ module.exports = {
   // Delete a thought 
   async deleteThought(req, res) {
     try {
-      const thought = await Thought.findOneAndRemove(
+      const thought = await Thought.findOneAndDelete(
         { _id: req.params.thoughtId });
 
       if (!thought) {
@@ -89,11 +91,22 @@ module.exports = {
   },
   // Create a new reaction   
   async createReaction(req, res) {
+    console.log('You are adding a reaction!');
+    console.log(req.body);
+
     try {
+      const thought = await Thought.findOne({ _id: req.params.thoughtId });
+
+      if (!thought) {
+        return res.status(404).json({ message: "Thought not found" });
+      }
+
+      console.log('Thought found');
+
       const reaction = await Reaction.create(req.body);
       // update the associated Thought 
       await Thought.findOneAndUpdate(
-        { _id: req.body.thoughtId },
+        { _id: req.params.thoughtId },
         { $push: { reactions: reaction._id } },
         { new: true }
       );
